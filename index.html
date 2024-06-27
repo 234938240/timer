@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Countdown Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        #timer {
+            font-size: 72px;
+            margin-bottom: 20px;
+        }
+        #controls {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 16px;
+        }
+        input {
+            padding: 5px;
+            font-size: 16px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div id="timer">30:00</div>
+    <div id="controls">
+        <button id="startBtn">Start</button>
+        <button id="resetBtn">Reset</button>
+        <button id="lockBtn">Lock</button>
+    </div>
+    <div style="margin-top: 20px;">
+        <input type="text" id="customTime" placeholder="Set Countdown Here: 10m, 3pm, 1 hour...">
+        <button id="setBtn">Set</button>
+    </div>
+
+    <script>
+        const timerDisplay = document.getElementById('timer');
+        const startBtn = document.getElementById('startBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const lockBtn = document.getElementById('lockBtn');
+        const customTimeInput = document.getElementById('customTime');
+        const setBtn = document.getElementById('setBtn');
+
+        let countdown;
+        let timeLeft = 30 * 60; // Default to 30 minutes
+        let isRunning = false;
+        let isLocked = false;
+
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function startTimer() {
+            if (!isRunning && !isLocked) {
+                isRunning = true;
+                countdown = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateDisplay();
+                    } else {
+                        clearInterval(countdown);
+                        isRunning = false;
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetTimer() {
+            if (!isLocked) {
+                clearInterval(countdown);
+                isRunning = false;
+                timeLeft = 30 * 60;
+                updateDisplay();
+            }
+        }
+
+        function toggleLock() {
+            isLocked = !isLocked;
+            lockBtn.textContent = isLocked ? "Unlock" : "Lock";
+        }
+
+        function setCustomTime() {
+            if (!isLocked) {
+                const input = customTimeInput.value.toLowerCase();
+                let newTime = 0;
+
+                if (input.includes('m')) {
+                    newTime = parseInt(input) * 60;
+                } else if (input.includes('h') || input.includes('hour')) {
+                    newTime = parseInt(input) * 3600;
+                } else {
+                    newTime = parseInt(input) * 60;
+                }
+
+                if (!isNaN(newTime) && newTime > 0) {
+                    timeLeft = newTime;
+                    updateDisplay();
+                }
+            }
+        }
+
+        startBtn.addEventListener('click', startTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        lockBtn.addEventListener('click', toggleLock);
+        setBtn.addEventListener('click', setCustomTime);
+
+        updateDisplay();
+    </script>
+</body>
+</html>
